@@ -1,24 +1,15 @@
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native'
-import React, { useEffect,useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 
-const GraphSimulator = ({ savingPlan, apf }) => {
+const GraphSimulator = ({ simulateGraph }) => {
 
-    const [savingPlanAho, setSavingPlanAho] = useState({
-        totalAmmount: 0,
-        interest: 0,
-        inverst: 0
-    })
-    const getSavingPlan = () => {
-
-    }
-
-    const calculatedInterest = (savingPlan, apf) => {
-        console.log(savingPlan)
-        console.log(apf)
-    }
+    const navigation = useNavigation()
+    
     useEffect(() => {
-        calculatedInterest(savingPlan, apf);
-    }, [])
+        console.log('En grafico')
+        console.log(simulateGraph)
+    }, [simulateGraph])
 
     return (
         <View>

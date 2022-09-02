@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, TouchableHighlight, View, Image, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { getParametric } from '../api'
 import GraphSimulator from '../components/GraphSimulator'
 
 const Simulator = () => {
-    const navigation = useNavigation()
 
     const [apf, setApf] = useState({})
     const [graph, setGraph] = useState(false)
@@ -16,21 +14,31 @@ const Simulator = () => {
     })
     const [isError, setIsError] = useState(false)
 
+    const [simulateGraph, setSimulateGraph] = useState({})
+
     const alertError = (data) => {
-        const { montmin, duration } = data
+        const { ammount, duration, value } = data
         const { duracion, mma } = apf
-        if (montmin < parseInt(mma) || duration < duracion) {
+        if (ammount < parseInt(mma) || duration < duracion) {
             Alert.alert('Error', 'Monto mínimo o Duración no permitida', [{ text: 'OK' }])
             setIsError(true)
+            setGraph(false)
         }
-        if (montmin === null || montmin.trim() === '') {
+        else if (ammount === null || ammount.trim() === '') {
             Alert.alert('Error', 'Campo Monto mínimo es obligatorio', [{ text: 'OK' }])
             setIsError(true)
+            setGraph(false)
         }
-        if (duration === null || duration.trim() === '') {
+        else if (duration === null || duration.trim() === '') {
             Alert.alert('Error', 'Campo Duracion es obligatorio', [{ text: 'OK' }])
             setIsError(true)
+            setGraph(false)
+        } else if (value === null || value.trim() === '') {
+            Alert.alert('Error', 'Campo Ahorro mensual es obligatorio', [{ text: 'OK' }])
+            setIsError(true)
+            setGraph(false)
         }
+
     }
     const closeKeyboard = () => {
         Keyboard.dismiss();
@@ -41,26 +49,54 @@ const Simulator = () => {
         const resp = await data[0]
         setApf({ id: resp.id, duracion: resp.dur_plan_min, mma: resp.mont_min_apert, tasa_min: resp.tasa_int_min, tasa_base: resp.tasa_int_base, tasa_max: resp.tasa_int_max });
     }
+
     useEffect(() => {
         loadApf();
+
     }, [])
 
-    const handleSubmit = async () => {
+
+    const handleSubmit = () => {
         try {
             alertError(savingPlan);
             if (!isError) {
+                const resp = calculatedInterest(savingPlan, apf)
+                setSimulateGraph(resp);
                 setGraph(true)
             }
-            //     await updateTask(route.params.id, task);
-
         } catch (error) {
             console.error(error)
         }
 
     }
+    const calculatedInterest = (savingPlan, apf) => {
+        const { tasa_base, tasa_max, tasa_min } = apf
+        const { duration, value, ammount } = savingPlan
+        let tasa = 0
+        let valueTotal = 0
+        let ammountInt = 0
+        let result = {}
+        let totalInverst = 0
+        if (duration < 6) {
+            tasa = parseFloat(tasa_min)
+            tasa = ((duration * tasa) / 12) / 100
+        } else if (duration >= 6 && duration <= 12) {
+            tasa = parseFloat(tasa_base)
+            tasa = ((duration * tasa) / 12) / 100
+        } else {
+            tasa = parseFloat(tasa_max)
+            tasa = ((duration * tasa) / 12) / 100
+        }
+        valueTotal = value * duration
+        ammountInt = valueTotal * tasa
+        totalInverst = valueTotal + ammountInt + parseFloat(ammount)
+        result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
+        return result
+    }
     const handleChange = (name, value) => {
         setSavingPlan({ ...savingPlan, [name]: value })
         setGraph(false)
+        //setSavingPlanAho({})
     }
 
     const { duracion, mma } = apf
@@ -83,18 +119,7 @@ const Simulator = () => {
 
                     <View style={{ paddingLeft: 20 }}>
 
-                        <View>
-                            <Text style={styles.label}>Con cuanto capital desea iniciar</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Ingrese el valor de apertura"
-                                keyboardType='numeric'
-                                maxLength={5}
-                                placeholderTextColor='#576574'
-                                onChangeText={(text) => handleChange('montmin', text.replace(/[^0-9]/g, ''))}
-                                value={savingPlan.ammount}
-                            />
-                        </View>
+
                         <View>
                             <Text style={styles.label}>Cuanto quisiera ahorrar mensualmente</Text>
                             <TextInput
@@ -119,6 +144,18 @@ const Simulator = () => {
                                 value={savingPlan.duration}
                             />
                         </View>
+                        <View>
+                            <Text style={styles.label}>Con cuanto capital desea iniciar</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Ingrese el valor de apertura"
+                                keyboardType='numeric'
+                                maxLength={5}
+                                placeholderTextColor='#576574'
+                                onChangeText={(text) => handleChange('ammount', text.replace(/[^0-9]/g, ''))}
+                                value={savingPlan.ammount}
+                            />
+                        </View>
                         <TouchableOpacity style={styles.btnSave}
                             onPress={handleSubmit}
                         >
@@ -126,8 +163,7 @@ const Simulator = () => {
                         </TouchableOpacity>
                     </View>
                     {
-                        graph? <GraphSimulator savingPlan={savingPlan} apf={apf} /> : <View></View>
-
+                        graph ? <GraphSimulator simulateGraph={simulateGraph} /> : <View></View>
                     }
 
                 </View>
