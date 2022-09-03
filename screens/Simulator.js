@@ -90,7 +90,9 @@ const Simulator = () => {
         valueTotal = value * duration
         ammountInt = valueTotal * tasa
         totalInverst = valueTotal + ammountInt + parseFloat(ammount)
+        console.log("VALORES A ENVIAR")
         result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
+        console.log(result)
         return result
     }
     const handleChange = (name, value) => {
