@@ -1,5 +1,5 @@
 const API = 'http://10.0.2.2:3000/apf'
-export const getTasks = async () => {
+export const getParametric = async () => {
     const resp = await fetch(API);
     return await resp.json();
 
