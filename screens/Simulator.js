@@ -59,6 +59,7 @@ const Simulator = () => {
     const handleSubmit = () => {
         try {
             alertError(savingPlan);
+            console.log(isError)
             if (!isError) {
                 const resp = calculatedInterest(savingPlan, apf)
                 setSimulateGraph(resp);
@@ -89,16 +90,13 @@ const Simulator = () => {
         }
         valueTotal = value * duration
         ammountInt = valueTotal * tasa
-        totalInverst = valueTotal + ammountInt + parseFloat(ammount)
-        console.log("VALORES A ENVIAR")
+        totalInverst = valueTotal + ammountInt + ammount
         result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
-        console.log(result)
         return result
     }
     const handleChange = (name, value) => {
         setSavingPlan({ ...savingPlan, [name]: value })
         setGraph(false)
-        //setSavingPlanAho({})
     }
 
     const { duracion, mma } = apf
@@ -107,10 +105,14 @@ const Simulator = () => {
         <TouchableWithoutFeedback onPress={() => closeKeyboard()}>
             <ScrollView>
                 <View >
-                    <View>
-                        <Text>Nota: Parametrización Banco</Text>
-                        <Text>Monto mínimo de apertura ${mma}</Text>
-                        <Text>Duración mínima de plan de ahorro {duracion} meses</Text>
+                    <View style={styles.containerNote}>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={styles.label1}>Parametrización Banco</Text>
+                        </View>
+                        <Text style={styles.label}>Monto mínimo de apertura: </Text>
+                        <Text style={styles.text1}>${mma}</Text>
+                        <Text style={styles.label}>Duración mínima de plan de ahorro: </Text>
+                        <Text style={styles.text}>{duracion} meses</Text>
                     </View>
                     <View style={{ textAlign: 'center', alignItems: 'center' }}>
                         <View style={styles.formImg}>
@@ -123,7 +125,7 @@ const Simulator = () => {
 
 
                         <View>
-                            <Text style={styles.label}>Cuanto quisiera ahorrar mensualmente</Text>
+                            <Text style={styles.label}>¿Cuánto quisiera ahorrar mensualmente?</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Ingrese el valor mensual para ahorro"
@@ -135,7 +137,7 @@ const Simulator = () => {
                             />
                         </View>
                         <View>
-                            <Text style={styles.label}>Durante cuantos meses desea ahorrar</Text>
+                            <Text style={styles.label}>¿Durante cuántos meses desea ahorrar?</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Ingrese cantidad de meses de ahorro"
@@ -147,7 +149,7 @@ const Simulator = () => {
                             />
                         </View>
                         <View>
-                            <Text style={styles.label}>Con cuanto capital desea iniciar</Text>
+                            <Text style={styles.label}>¿Con cuánto capital desea iniciar?</Text>
                             <TextInput
                                 style={styles.input}
                                 placeholder="Ingrese el valor de apertura"
@@ -193,6 +195,7 @@ const styles = StyleSheet.create({
     formImg: {
         width: 100,
         height: 100,
+        marginTop:10,
         alignItems: 'center'
     },
     input: {
@@ -219,5 +222,22 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         backgroundColor: '#10ac84',
         width: '90%'
+    },
+    containerNote: {
+        backgroundColor: '#FFF',
+        borderBottomColor: 'e1e1e1',
+        borderStyle: 'solid',
+        borderBottomWidth: 1,
+        paddingBottom: 20,
+        paddingHorizontal: 15
+    },
+    text1: {
+        fontSize: 14,
+        marginTop: 6,
+    },
+    label1: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginTop: 15,
     },
 })

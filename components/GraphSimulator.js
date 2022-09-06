@@ -21,7 +21,7 @@ const GraphSimulator = ({ simulateGraph }) => {
     useEffect(() => {
         const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
         const valueData = {
-            labels: [`Interés Ganado`, "Ahorro sin Interés", "Total Ahorrado"],
+            labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
             data: [interest, inverst, totalAmmount]
         }
         setData(valueData)
@@ -31,9 +31,9 @@ const GraphSimulator = ({ simulateGraph }) => {
 
     const calcPorcentGraph = (simulateGraph) => {
         let { totalAmmount, inverst, interest } = simulateGraph
-        const percent = totalAmmount+ inverst+ interest
+        const percent = totalAmmount + inverst + interest
         totalAmmount = totalAmmount / percent;
-        inverst = inverst  / percent;
+        inverst = inverst / percent;
         interest = interest / percent;
         totalAmmount = (Math.round(totalAmmount * 10) / 10) + 0.1
         inverst = (Math.round(inverst * 10) / 10)
@@ -43,23 +43,26 @@ const GraphSimulator = ({ simulateGraph }) => {
     }
     return (
 
-        <View>
-            <Text>Simulación de Ahorro </Text>
+        <View style={{alignItems: 'center'}}>
+            
+            <Text style={styles.title}>Simulación de Ahorro </Text>
             <View>
                 {
                     showGraph ? <ProgressChart
                         data={data}
                         width={screenWidth}
-                        height={220}
+                        height={230}
+                        radius={20}
                         chartConfig={chartConfig}
+                        style={{ marginVertical: 8, borderRadius: 10 }}
                     /> : <Text>Sin graph</Text>
 
                 }
 
             </View>
-            <TouchableHighlight style={{ backgroundColor: "#ee5253", padding: 7, borderRadius: 5 }}
+            <TouchableHighlight style={styles.btnSubmit}
                 onPress={() => navigation.navigate('CreateAccount')}>
-                <Text>Invertir en este Plan</Text>
+                <Text style={styles.textSubmit}>Invertir en este Plan</Text>
             </TouchableHighlight>
 
         </View>
@@ -67,8 +70,29 @@ const GraphSimulator = ({ simulateGraph }) => {
 }
 
 export default GraphSimulator
+const styles = StyleSheet.create({
+    title: {
+        fontWeight:'bold',
+        fontSize:20
+    },
+    btnSubmit: {
+        padding: 10,
+        backgroundColor: 'green',
+        marginVertical: 10
+    },
+    textSubmit: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    }
+})
 const chartConfig = {
     backgroundGradientFrom: '#1E2923',
     backgroundGradientTo: '#08130D',
-    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`
+    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    decimalPlaces: 2,
+    style:{
+        borderRadius:18
+    }
 }
