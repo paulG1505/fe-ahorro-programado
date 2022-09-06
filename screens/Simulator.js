@@ -5,8 +5,11 @@ import useFetchAPF from '../components/useFetchAPF'
 
 const Simulator = () => {
 
+    const [simulateGraph, setSimulateGraph] = useState({})
+
     const [graph, setGraph] = useState(false)
     const { apf, isLoading } = useFetchAPF();
+    const { duracion, mma } = apf
 
     const [savingPlan, setSavingPlan] = useState({
         ammount: '',
@@ -14,11 +17,10 @@ const Simulator = () => {
         value: ''
     })
 
-    const [simulateGraph, setSimulateGraph] = useState({})
-
+    
     const alertError = (data) => {
         const { ammount, duration, value } = data
-        const { duracion, mma } = apf
+        
         let error = false;
         if (ammount < parseInt(mma) || duration < duracion) {
             error = true
@@ -30,9 +32,9 @@ const Simulator = () => {
             Alert.alert('Error', 'Campo Monto mínimo es obligatorio', [{ text: 'OK' }])
             setGraph(false)
         }
-        else if (duration === null || duration.trim() === '') {
+        else if (duration === null || duration.trim() === '' || duration>48) {
             error = true
-            Alert.alert('Error', 'Campo Duracion es obligatorio', [{ text: 'OK' }])
+            Alert.alert('Error', 'Campo Duracion es obligatorio o Cantidad de Meses no permitidos', [{ text: 'OK' }])
             setGraph(false)
         } else if (value === null || value.trim() === '') {
             error = true
@@ -45,25 +47,16 @@ const Simulator = () => {
         Keyboard.dismiss();
     }
 
-
-    useEffect(() => {
-        handleSubmit();
-    }, [simulateGraph,graph])
-    
-
     const handleSubmit = () => {
         try {
             const error = alertError(savingPlan);
             if (error === false) {
-                console.log("Entra", graph)
                 const resp = calculatedInterest(savingPlan, apf)
                 console.log("RESP",resp);
                 setSimulateGraph(resp);
                 setGraph(true)
                 console.log("SIMULACION",simulateGraph)
                 console.log("GRAFICO",graph)
-                console.log("fin", graph)
-
             }
         } catch (error) {
             console.error(error)
@@ -90,16 +83,21 @@ const Simulator = () => {
         }
         valueTotal = value * duration
         ammountInt = valueTotal * tasa
-        totalInverst = valueTotal + ammountInt + ammount
+        totalInverst = parseFloat(valueTotal) + parseFloat(ammountInt) + parseFloat(ammount)
         result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
+        console.log("VALOR DE CALCULO",result)
         return result
     }
     const handleChange = (name, value) => {
         setSavingPlan({ ...savingPlan, [name]: value })
         setGraph(false)
+        setSimulateGraph({})
     }
 
-    const { duracion, mma } = apf
+    useEffect(() => {
+      console.log("CAMBIO GRAPH",graph);
+    }, [graph,setSimulateGraph])
+    
 
     return (
         <TouchableWithoutFeedback onPress={() => closeKeyboard()}>

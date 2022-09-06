@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableHighlight, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { ProgressChart} from "react-native-chart-kit";
+import { ProgressChart } from "react-native-chart-kit";
 
 const GraphSimulator = ({ simulateGraph }) => {
 
@@ -10,20 +10,14 @@ const GraphSimulator = ({ simulateGraph }) => {
     const [showGraph, setShowGraph] = useState(false)
     const [data, setData] = useState({})
 
-    useEffect(() => {
-        const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
-        const valueData = {
-            labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
-            data: [interest, inverst, totalAmmount]
-        }
-        setData(valueData)
-        setShowGraph(true)
-    }, [])
+    console.log("INGRESA A GRAFICO", simulateGraph)
 
 
     const calcPorcentGraph = (simulateGraph) => {
+        console.log("INGRESA AL CALCULO ", simulateGraph)
         let { totalAmmount, inverst, interest } = simulateGraph
-        const percent = totalAmmount + inverst + interest
+        const percent = parseFloat(totalAmmount) + parseFloat(inverst) + parseFloat(interest)
+        console.log("PORCENTAJE", percent)
         totalAmmount = totalAmmount / percent;
         inverst = inverst / percent;
         interest = interest / percent;
@@ -33,12 +27,24 @@ const GraphSimulator = ({ simulateGraph }) => {
         const valuePercent = { totalAmmount, inverst, interest }
         return valuePercent
     }
+
+    useEffect(() => {
+        const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
+        console.log("VALORES EN GRAFICO USE EFFECT", interest, inverst, totalAmmount)
+        const valueData = {
+            labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
+            data: [interest, inverst, totalAmmount]
+        }
+        setData(valueData)
+        setShowGraph(true)
+    }, [simulateGraph])
     return (
 
-        <View style={{alignItems: 'center'}}>
-            
+        <View style={{ alignItems: 'center' }}>
+
             <Text style={styles.title}>Simulación de Ahorro </Text>
             <View>
+
                 {
                     showGraph ? <ProgressChart
                         data={data}
@@ -50,7 +56,6 @@ const GraphSimulator = ({ simulateGraph }) => {
                     /> : <Text>Sin graph</Text>
 
                 }
-
             </View>
             <TouchableHighlight style={styles.btnSubmit}
                 onPress={() => navigation.navigate('CreateAccount')}>
@@ -64,8 +69,8 @@ const GraphSimulator = ({ simulateGraph }) => {
 export default GraphSimulator
 const styles = StyleSheet.create({
     title: {
-        fontWeight:'bold',
-        fontSize:20
+        fontWeight: 'bold',
+        fontSize: 20
     },
     btnSubmit: {
         padding: 10,
@@ -84,7 +89,7 @@ const chartConfig = {
     color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     decimalPlaces: 2,
-    style:{
-        borderRadius:18
+    style: {
+        borderRadius: 18
     }
 }
