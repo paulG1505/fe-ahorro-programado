@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, TouchableHighlight, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
 import { ProgressChart } from "react-native-chart-kit";
 
 const GraphSimulator = ({ simulateGraph }) => {
