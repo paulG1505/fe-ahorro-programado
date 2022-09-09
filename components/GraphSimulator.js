@@ -5,19 +5,13 @@ import { ProgressChart } from "react-native-chart-kit";
 
 const GraphSimulator = ({ simulateGraph }) => {
 
-    const navigation = useNavigation()
     const screenWidth = Dimensions.get('window').width
     const [showGraph, setShowGraph] = useState(false)
     const [data, setData] = useState({})
 
-    console.log("INGRESA A GRAFICO", simulateGraph)
-
-
     const calcPorcentGraph = (simulateGraph) => {
-        console.log("INGRESA AL CALCULO ", simulateGraph)
         let { totalAmmount, inverst, interest } = simulateGraph
         const percent = parseFloat(totalAmmount) + parseFloat(inverst) + parseFloat(interest)
-        console.log("PORCENTAJE", percent)
         totalAmmount = totalAmmount / percent;
         inverst = inverst / percent;
         interest = interest / percent;
@@ -30,7 +24,6 @@ const GraphSimulator = ({ simulateGraph }) => {
 
     useEffect(() => {
         const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
-        console.log("VALORES EN GRAFICO USE EFFECT", interest, inverst, totalAmmount)
         const valueData = {
             labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
             data: [interest, inverst, totalAmmount]
@@ -46,19 +39,30 @@ const GraphSimulator = ({ simulateGraph }) => {
             <View>
 
                 {
-                    showGraph ? <ProgressChart
-                        data={data}
-                        width={screenWidth}
-                        height={230}
-                        radius={20}
-                        chartConfig={chartConfig}
-                        style={{ marginVertical: 8, borderRadius: 10 }}
-                    /> : <Text>Sin graph</Text>
+                    showGraph ? <View>
+                        <View style={styles.containerPlan}>
+                            <Text style={styles.labelSim}>Monto Invertido:    ${parseFloat(simulateGraph.inverst).toFixed(2)}</Text>
+                            <Text style={styles.labelSim}>Interés Ganado:      ${parseFloat(simulateGraph.interest).toFixed(2)} </Text>
+                            <Text style={styles.labelSim}>Total Ganado:         ${parseFloat(simulateGraph.totalAmmount).toFixed(2)}</Text>
+
+                        </View>
+
+                        <ProgressChart
+                            data={data}
+                            width={screenWidth}
+                            height={230}
+                            radius={20}
+                            chartConfig={chartConfig}
+                            style={{ marginVertical: 8, borderRadius: 10 }}
+                        />
+                    </View>
+                        :
+                        <Text>Sin graph</Text>
 
                 }
             </View>
             <TouchableHighlight style={styles.btnSubmit}
-                onPress={() => navigation.navigate('CreateAccount')}>
+            >
                 <Text style={styles.textSubmit}>Invertir en este Plan</Text>
             </TouchableHighlight>
 
@@ -77,9 +81,28 @@ const styles = StyleSheet.create({
         backgroundColor: 'green',
         marginVertical: 10
     },
+    containerPlan: {
+        backgroundColor: '#64c27b',
+        borderBottomColor: 'e1e1e1',
+        borderStyle: 'solid',
+        borderBottomWidth: 1,
+        paddingBottom: 20,
+        paddingHorizontal: 15
+    },
+    textSim: {
+        fontSize: 16,
+        marginTop: 6,
+        fontWeight: 'bold',
+    },
+    labelSim: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginTop: 15,
+    },
     textSubmit: {
         color: '#FFF',
         fontWeight: 'bold',
+        fontSize: 16,
         textAlign: 'center',
     }
 })

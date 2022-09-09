@@ -17,10 +17,10 @@ const Simulator = () => {
         value: ''
     })
 
-    
+
     const alertError = (data) => {
         const { ammount, duration, value } = data
-        
+
         let error = false;
         if (ammount < parseInt(mma) || duration < duracion) {
             error = true
@@ -32,7 +32,7 @@ const Simulator = () => {
             Alert.alert('Error', 'Campo Monto mínimo es obligatorio', [{ text: 'OK' }])
             setGraph(false)
         }
-        else if (duration === null || duration.trim() === '' || duration>48) {
+        else if (duration === null || duration.trim() === '' || duration > 48) {
             error = true
             Alert.alert('Error', 'Campo Duracion es obligatorio o Cantidad de Meses no permitidos', [{ text: 'OK' }])
             setGraph(false)
@@ -52,11 +52,8 @@ const Simulator = () => {
             const error = alertError(savingPlan);
             if (error === false) {
                 const resp = calculatedInterest(savingPlan, apf)
-                console.log("RESP",resp);
                 setSimulateGraph(resp);
                 setGraph(true)
-                console.log("SIMULACION",simulateGraph)
-                console.log("GRAFICO",graph)
             }
         } catch (error) {
             console.error(error)
@@ -85,7 +82,6 @@ const Simulator = () => {
         ammountInt = valueTotal * tasa
         totalInverst = parseFloat(valueTotal) + parseFloat(ammountInt) + parseFloat(ammount)
         result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
-        console.log("VALOR DE CALCULO",result)
         return result
     }
     const handleChange = (name, value) => {
@@ -95,9 +91,9 @@ const Simulator = () => {
     }
 
     useEffect(() => {
-      console.log("CAMBIO GRAPH",graph);
-    }, [graph,setSimulateGraph])
-    
+        
+    }, [graph, setSimulateGraph])
+
 
     return (
         <TouchableWithoutFeedback onPress={() => closeKeyboard()}>
@@ -115,14 +111,14 @@ const Simulator = () => {
                                 <Text style={styles.text}>{duracion} meses</Text>
                             </View>
                     }
-                    <View style={{ textAlign: 'center', alignItems: 'center' }}>
+                    <View style={{ textAlign: 'center', alignItems: 'center', paddingVertical: 15 }}>
                         <View style={styles.formImg}>
                             <Image style={styles.img} source={require('../img/calculadora.png')} />
                         </View>
-                        <Text>Ingrese datos para simulación</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Ingrese datos para simulación</Text>
                     </View>
 
-                    <View style={{ paddingLeft: 20 }}>
+                    <View style={{ paddingLeft: 25 }}>
 
 
                         <View>
@@ -161,11 +157,13 @@ const Simulator = () => {
                                 value={savingPlan.ammount}
                             />
                         </View>
-                        <TouchableOpacity style={styles.btnSave}
-                            onPress={handleSubmit}
-                        >
-                            <Text style={styles.textbtn}>Calcular</Text>
-                        </TouchableOpacity>
+                        <View style={{paddingTop:15}}>
+                            <TouchableOpacity style={styles.btnSave}
+                                onPress={handleSubmit}
+                            >
+                                <Text style={styles.textbtn}>Calcular</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     {
                         graph ? <GraphSimulator simulateGraph={simulateGraph} /> : <View></View>
@@ -185,7 +183,8 @@ const styles = StyleSheet.create({
     },
     textbtn: {
         color: 'black',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize:17
     },
     img: {
         padding: 10,
@@ -217,7 +216,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     btnSave: {
-        paddingTop: 10,
+        paddingTop: 12,
         paddingBottom: 10,
         borderRadius: 5,
         marginBottom: 20,
@@ -225,7 +224,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     containerNote: {
-        backgroundColor: '#FFF',
+        backgroundColor: '#d0fdd7',
         borderBottomColor: 'e1e1e1',
         borderStyle: 'solid',
         borderBottomWidth: 1,

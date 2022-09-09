@@ -3,7 +3,6 @@ import {API} from '@env'
 export const getParametric = async () => {
     const resp = await fetch(API);
     return await resp.json();
-
 }
 
 export const getTask = async (id) => {
