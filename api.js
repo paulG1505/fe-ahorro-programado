@@ -1,8 +1,8 @@
-const API = 'http://10.0.2.2:3000/apf'
+import {API} from '@env'
+
 export const getParametric = async () => {
     const resp = await fetch(API);
     return await resp.json();
-
 }
 
 export const getTask = async (id) => {

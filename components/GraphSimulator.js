@@ -1,37 +1,16 @@
 import { StyleSheet, Text, View, TouchableHighlight, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
-
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { ProgressChart } from "react-native-chart-kit";
 
 const GraphSimulator = ({ simulateGraph }) => {
 
-    const navigation = useNavigation()
     const screenWidth = Dimensions.get('window').width
     const [showGraph, setShowGraph] = useState(false)
     const [data, setData] = useState({})
 
-    useEffect(() => {
-        const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
-        const valueData = {
-            labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
-            data: [interest, inverst, totalAmmount]
-        }
-        setData(valueData)
-        setShowGraph(true)
-    }, [])
-
-
     const calcPorcentGraph = (simulateGraph) => {
         let { totalAmmount, inverst, interest } = simulateGraph
-        const percent = totalAmmount + inverst + interest
+        const percent = parseFloat(totalAmmount) + parseFloat(inverst) + parseFloat(interest)
         totalAmmount = totalAmmount / percent;
         inverst = inverst / percent;
         interest = interest / percent;
@@ -41,27 +20,48 @@ const GraphSimulator = ({ simulateGraph }) => {
         const valuePercent = { totalAmmount, inverst, interest }
         return valuePercent
     }
+
+    useEffect(() => {
+        const { interest, inverst, totalAmmount } = calcPorcentGraph(simulateGraph)
+        const valueData = {
+            labels: [`Interés Ganado`, "Ahorro S/N Int ", "Total Ahorrado"],
+            data: [interest, inverst, totalAmmount]
+        }
+        setData(valueData)
+        setShowGraph(true)
+    }, [simulateGraph])
     return (
 
-        <View style={{alignItems: 'center'}}>
-            
+        <View style={{ alignItems: 'center' }}>
+
             <Text style={styles.title}>Simulación de Ahorro </Text>
             <View>
+
                 {
-                    showGraph ? <ProgressChart
-                        data={data}
-                        width={screenWidth}
-                        height={230}
-                        radius={20}
-                        chartConfig={chartConfig}
-                        style={{ marginVertical: 8, borderRadius: 10 }}
-                    /> : <Text>Sin graph</Text>
+                    showGraph ? <View>
+                        <View style={styles.containerPlan}>
+                            <Text style={styles.labelSim}>Monto Invertido:    ${parseFloat(simulateGraph.inverst).toFixed(2)}</Text>
+                            <Text style={styles.labelSim}>Interés Ganado:      ${parseFloat(simulateGraph.interest).toFixed(2)} </Text>
+                            <Text style={styles.labelSim}>Total Ganado:         ${parseFloat(simulateGraph.totalAmmount).toFixed(2)}</Text>
+
+                        </View>
+
+                        <ProgressChart
+                            data={data}
+                            width={screenWidth}
+                            height={230}
+                            radius={20}
+                            chartConfig={chartConfig}
+                            style={{ marginVertical: 8, borderRadius: 10 }}
+                        />
+                    </View>
+                        :
+                        <Text>Sin graph</Text>
 
                 }
-
             </View>
             <TouchableHighlight style={styles.btnSubmit}
-                onPress={() => navigation.navigate('CreateAccount')}>
+            >
                 <Text style={styles.textSubmit}>Invertir en este Plan</Text>
             </TouchableHighlight>
 
@@ -72,17 +72,36 @@ const GraphSimulator = ({ simulateGraph }) => {
 export default GraphSimulator
 const styles = StyleSheet.create({
     title: {
-        fontWeight:'bold',
-        fontSize:20
+        fontWeight: 'bold',
+        fontSize: 20
     },
     btnSubmit: {
         padding: 10,
         backgroundColor: 'green',
         marginVertical: 10
     },
+    containerPlan: {
+        backgroundColor: '#64c27b',
+        borderBottomColor: 'e1e1e1',
+        borderStyle: 'solid',
+        borderBottomWidth: 1,
+        paddingBottom: 20,
+        paddingHorizontal: 15
+    },
+    textSim: {
+        fontSize: 16,
+        marginTop: 6,
+        fontWeight: 'bold',
+    },
+    labelSim: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginTop: 15,
+    },
     textSubmit: {
         color: '#FFF',
         fontWeight: 'bold',
+        fontSize: 16,
         textAlign: 'center',
     }
 })
@@ -92,7 +111,7 @@ const chartConfig = {
     color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     decimalPlaces: 2,
-    style:{
-        borderRadius:18
+    style: {
+        borderRadius: 18
     }
 }

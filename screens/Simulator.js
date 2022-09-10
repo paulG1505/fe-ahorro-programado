@@ -1,66 +1,56 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import { getParametric } from '../api'
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from 'react-native'
 import GraphSimulator from '../components/GraphSimulator'
+import useFetchAPF from '../components/useFetchAPF'
 
 const Simulator = () => {
 
-    const [apf, setApf] = useState({})
+    const [simulateGraph, setSimulateGraph] = useState({})
+
     const [graph, setGraph] = useState(false)
+    const { apf, isLoading } = useFetchAPF();
+    const { duracion, mma } = apf
+
     const [savingPlan, setSavingPlan] = useState({
         ammount: '',
         duration: '',
         value: ''
     })
-    const [isError, setIsError] = useState(false)
 
-    const [simulateGraph, setSimulateGraph] = useState({})
 
     const alertError = (data) => {
         const { ammount, duration, value } = data
-        const { duracion, mma } = apf
+
+        let error = false;
         if (ammount < parseInt(mma) || duration < duracion) {
+            error = true
             Alert.alert('Error', 'Monto mínimo o Duración no permitida', [{ text: 'OK' }])
-            setIsError(true)
             setGraph(false)
         }
         else if (ammount === null || ammount.trim() === '') {
+            error = true
             Alert.alert('Error', 'Campo Monto mínimo es obligatorio', [{ text: 'OK' }])
-            setIsError(true)
             setGraph(false)
         }
-        else if (duration === null || duration.trim() === '') {
-            Alert.alert('Error', 'Campo Duracion es obligatorio', [{ text: 'OK' }])
-            setIsError(true)
+        else if (duration === null || duration.trim() === '' || duration > 48) {
+            error = true
+            Alert.alert('Error', 'Campo Duracion es obligatorio o Cantidad de Meses no permitidos', [{ text: 'OK' }])
             setGraph(false)
         } else if (value === null || value.trim() === '') {
+            error = true
             Alert.alert('Error', 'Campo Ahorro mensual es obligatorio', [{ text: 'OK' }])
-            setIsError(true)
             setGraph(false)
         }
-
+        return error;
     }
     const closeKeyboard = () => {
         Keyboard.dismiss();
     }
 
-    const loadApf = async () => {
-        const data = await getParametric();
-        const resp = await data[0]
-        setApf({ id: resp.id, duracion: resp.dur_plan_min, mma: resp.mont_min_apert, tasa_min: resp.tasa_int_min, tasa_base: resp.tasa_int_base, tasa_max: resp.tasa_int_max });
-    }
-
-    useEffect(() => {
-        loadApf();
-
-    }, [])
-
-
     const handleSubmit = () => {
         try {
-            alertError(savingPlan);
-            console.log(isError)
-            if (!isError) {
+            const error = alertError(savingPlan);
+            if (error === false) {
                 const resp = calculatedInterest(savingPlan, apf)
                 setSimulateGraph(resp);
                 setGraph(true)
@@ -90,38 +80,45 @@ const Simulator = () => {
         }
         valueTotal = value * duration
         ammountInt = valueTotal * tasa
-        totalInverst = valueTotal + ammountInt + ammount
+        totalInverst = parseFloat(valueTotal) + parseFloat(ammountInt) + parseFloat(ammount)
         result = { totalAmmount: totalInverst, interest: ammountInt, inverst: valueTotal, tasa_int: tasa }
         return result
     }
     const handleChange = (name, value) => {
         setSavingPlan({ ...savingPlan, [name]: value })
         setGraph(false)
+        setSimulateGraph({})
     }
 
-    const { duracion, mma } = apf
+    useEffect(() => {
+        
+    }, [graph, setSimulateGraph])
+
 
     return (
         <TouchableWithoutFeedback onPress={() => closeKeyboard()}>
             <ScrollView>
                 <View >
-                    <View style={styles.containerNote}>
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={styles.label1}>Parametrización Banco</Text>
-                        </View>
-                        <Text style={styles.label}>Monto mínimo de apertura: </Text>
-                        <Text style={styles.text1}>${mma}</Text>
-                        <Text style={styles.label}>Duración mínima de plan de ahorro: </Text>
-                        <Text style={styles.text}>{duracion} meses</Text>
-                    </View>
-                    <View style={{ textAlign: 'center', alignItems: 'center' }}>
+                    {
+                        isLoading ? <ActivityIndicator /> :
+                            <View style={styles.containerNote}>
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={styles.label1}>Parametrización Banco</Text>
+                                </View>
+                                <Text style={styles.label}>Monto mínimo de apertura: </Text>
+                                <Text style={styles.text1}>${mma}</Text>
+                                <Text style={styles.label}>Duración mínima de plan de ahorro: </Text>
+                                <Text style={styles.text}>{duracion} meses</Text>
+                            </View>
+                    }
+                    <View style={{ textAlign: 'center', alignItems: 'center', paddingVertical: 15 }}>
                         <View style={styles.formImg}>
                             <Image style={styles.img} source={require('../img/calculadora.png')} />
                         </View>
-                        <Text>Ingrese datos para simulación</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Ingrese datos para simulación</Text>
                     </View>
 
-                    <View style={{ paddingLeft: 20 }}>
+                    <View style={{ paddingLeft: 25 }}>
 
 
                         <View>
@@ -160,11 +157,13 @@ const Simulator = () => {
                                 value={savingPlan.ammount}
                             />
                         </View>
-                        <TouchableOpacity style={styles.btnSave}
-                            onPress={handleSubmit}
-                        >
-                            <Text style={styles.textbtn}>Calcular</Text>
-                        </TouchableOpacity>
+                        <View style={{paddingTop:15}}>
+                            <TouchableOpacity style={styles.btnSave}
+                                onPress={handleSubmit}
+                            >
+                                <Text style={styles.textbtn}>Calcular</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     {
                         graph ? <GraphSimulator simulateGraph={simulateGraph} /> : <View></View>
@@ -184,7 +183,8 @@ const styles = StyleSheet.create({
     },
     textbtn: {
         color: 'black',
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize:17
     },
     img: {
         padding: 10,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     formImg: {
         width: 100,
         height: 100,
-        marginTop:10,
+        marginTop: 10,
         alignItems: 'center'
     },
     input: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     btnSave: {
-        paddingTop: 10,
+        paddingTop: 12,
         paddingBottom: 10,
         borderRadius: 5,
         marginBottom: 20,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
         width: '90%'
     },
     containerNote: {
-        backgroundColor: '#FFF',
+        backgroundColor: '#d0fdd7',
         borderBottomColor: 'e1e1e1',
         borderStyle: 'solid',
         borderBottomWidth: 1,

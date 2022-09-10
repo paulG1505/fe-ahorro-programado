@@ -1,14 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import React from 'react'
 
 const CreateAccount = () => {
   return (
     <View>
-      <Text>CreateAccount</Text>
+      <Text>Creación cuenta ahorro Programado</Text>
     </View>
   )
 }
 
 export default CreateAccount
-
-const styles = StyleSheet.create({})
